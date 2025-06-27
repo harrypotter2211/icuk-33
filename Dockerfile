@@ -1,17 +1,11 @@
-# Use the official Tomcat base image
-FROM tomcat:9.0
+# Use JDK-only image for runtime (smaller size)
+FROM eclipse-temurin:17-jdk
 
-# Maintainer (optional)
-LABEL maintainer="Ma Ping <your-email@example.com>"
+# Create working directory
+WORKDIR /app
 
-# Remove the default ROOT web app
-RUN rm -rf /usr/local/tomcat/webapps/ROOT
+# Copy built JAR from the build stage
+COPY --from=build /app/target/*.jar app.jar
 
-# Copy your WAR file into Tomcat's webapps directory and rename to ROOT.war
-COPY target/my-app.war /usr/local/tomcat/webapps/ROOT.war
-
-# Expose Tomcat's default port
-EXPOSE 8080
-
-# Start Tomcat server (default command already handles this)
-CMD ["catalina.sh", "run"]
+# Command to run the application
+ENTRYPOINT ["java", "-jar", "app.jar"]
