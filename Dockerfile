@@ -1,11 +1,26 @@
-# Use official Maven image with JDK 17
-FROM maven:3.9.6-eclipse-temurin-17 as build
+# Stage 1: Build with Maven and JDK 17
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 
-# Set working directory in the container
+# Set working directory inside the container
 WORKDIR /app
 
-# Copy source code to container
+# Copy source code into container
 COPY . .
 
-# Build the project and run tests (includes Sonar if configured in pom.xml)
-RUN mvn clean verify
+# Package the WAR file
+RUN mvn clean package -DskipTests
+
+# Stage 2: Deploy to Tomcat
+FROM tomcat:9.0
+
+# Remove default ROOT webapp
+RUN rm -rf /usr/local/tomcat/webapps/ROOT
+
+# Copy the WAR file from the Maven build stage
+COPY --from=build /app/target/*.war /usr/local/tomcat/webapps/ROOT.war
+
+# Expose Tomcat default port
+EXPOSE 8080
+
+# Start Tomcat
+CMD ["catalina.sh", "run"]
