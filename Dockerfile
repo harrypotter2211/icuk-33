@@ -8,7 +8,7 @@ LABEL maintainer="Ma Ping <your-email@example.com>"
 RUN rm -rf /usr/local/tomcat/webapps/ROOT
 
 # Copy your WAR file into Tomcat's webapps directory and rename to ROOT.war
-COPY target/calculator.war /usr/local/tomcat/webapps/ROOT.war
+COPY target/my-app.war /usr/local/tomcat/webapps/ROOT.war
 
 # Expose Tomcat's default port
 EXPOSE 8080
